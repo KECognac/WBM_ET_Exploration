@@ -43,6 +43,7 @@ from .met_pet import (
     clear_sky_rad,
     outgoing_rad,
     get_daylength,
+    get_wind_speed_2m,
     get_oudin_pet,
     get_hamon_pet,
     get_penman_monteith_pet,
@@ -74,7 +75,7 @@ from .raster_io import (
 __all__ = [
     # met_pet
     "get_svp", "actual_vp", "atm_press", "psyc_constant", "vapor_curve",
-    "clear_sky_rad", "outgoing_rad", "get_daylength",
+    "clear_sky_rad", "outgoing_rad", "get_daylength", "get_wind_speed_2m",
     "get_oudin_pet", "get_hamon_pet", "get_penman_monteith_pet",
     "get_gdd", "get_deficit",
     # snow_soil
