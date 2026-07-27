@@ -7,10 +7,12 @@ flux towers, across six NPS sites spanning a 0–4,350 m elevation gradient.
 Originally developed as a class project (CIVE 523, Remote Sensing Hydrology);
 reorganized here into a standalone, reproducible repo.
 
-**[View the results report](reports/pet_comparison_report.html)** — a concise,
-self-contained HTML summary comparing the Oudin and Penman-Monteith WBM AET
-runs against OpenET and flux towers (open the file directly; all figures are
-embedded, no other files needed).
+### 📊 [View the results report](https://kecognac.github.io/WBM_ET_Exploration/reports/pet_comparison_report.html)
+
+A concise, self-contained HTML summary comparing the Oudin and
+Penman-Monteith WBM AET runs against OpenET and flux towers (live page via
+GitHub Pages — see [Setup](#setup) below if it's not enabled yet). Source
+file: [`reports/pet_comparison_report.html`](reports/pet_comparison_report.html).
 
 ## What this does
 
@@ -34,15 +36,17 @@ embedded, no other files needed).
    crop coefficient (`Kc = 1.0` baseline, easy to change) to convert
    ETo → PET before running it through the same WBM soil/snow/AET machinery
    as the Oudin run.
-7. (`notebook 07`) Benchmarks *both* PET methods' WBM AET against OpenET (the
-   same 4 km gridcell ensemble notebook 04 validates the Oudin run against)
-   and against flux tower ET, producing per-site bias/RMSE/R² tables for all
-   four comparisons, scatter plots, an ecosystem RMSE comparison, a per-site
-   AET timeseries (OpenET vs. Oudin vs. Penman-Monteith vs. flux tower), and
-   a spatial map of which method matches OpenET better at each site.
-   Uncalibrated, read-only (no WBM run or GEE access) — just reads notebooks
-   02/03/06's cached outputs. See `reports/pet_comparison_report.html` for a
-   narrative summary of the results.
+7. (`notebook 07`) Benchmarks *three* WBM AET variants — default Oudin,
+   notebook 04's PET-multiplier-**calibrated** Oudin, and (uncalibrated)
+   Penman-Monteith — against OpenET (the same 4 km gridcell ensemble
+   notebook 04 validates against) and against flux tower ET, producing
+   per-site bias/RMSE/R² tables for all six comparisons, scatter plots, an
+   ecosystem RMSE comparison, a per-site AET timeseries (OpenET vs. all three
+   WBM variants vs. flux tower), and a spatial map of which variant matches
+   OpenET best at each site. Read-only (no WBM run or GEE access) — just
+   reads notebooks 02/03/04/06's cached outputs. See
+   `reports/pet_comparison_report.html` for a narrative summary of the
+   results.
 
 ## Repo structure
 
@@ -76,6 +80,15 @@ under `Data/`, so re-running a later notebook doesn't require repeating an
 earlier notebook's downloads.
 
 ## Setup
+
+**Enabling the results report link above:** GitHub doesn't render `.html`
+files inline, so the report needs [GitHub Pages](https://pages.github.com/)
+turned on once: repo **Settings → Pages → Build and deployment → Source:
+Deploy from a branch → Branch: `main`, folder: `/ (root)` → Save**. After a
+minute it's live at `https://<username>.github.io/<repo>/reports/pet_comparison_report.html`.
+It also helps to set the repo's **Website** field (gear icon next to "About"
+on the repo's main page) to that same URL — it then shows as a clickable
+link right under the repo name for anyone landing on the page.
 
 ```bash
 conda env create -f environment.yml
