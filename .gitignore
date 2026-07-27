@@ -1,0 +1,50 @@
+# ── Data ───────────────────────────────────────────────────────────────────
+# All local/generated data (raw inputs, GEE pulls, flux-tower dataset, WBM
+# rasters, cached run outputs, figures) is excluded — it's large (~1.5GB),
+# and notebooks/01-05 already regenerate or re-download everything, with
+# cached-CSV reload paths at each expensive step. See README.md for how to
+# fetch/regenerate Data/.
+Data/
+
+# ── Class deliverables / reference docs ─────────────────────────────────────
+# Kept locally as a project record but not pushed to the public repo
+# (the reference PDF in particular is a copyrighted journal article).
+docs/
+
+# ── Scratch: files staged for local deletion, not for git ───────────────────
+to_delete/
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# ── Jupyter ──────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── Conda / venv ─────────────────────────────────────────────────────────────
+.conda/
+.venv/
+venv/
+env/
+
+# ── Editors / OS ─────────────────────────────────────────────────────────────
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~
+*.un~
+
+# ── Earth Engine / credentials ───────────────────────────────────────────────
+.config/earthengine/
+*.json.key
+credentials.json
+
+# ── GDAL sidecar files (regenerable) ─────────────────────────────────────────
+*.tif.ovr
+*.tif.aux.xml

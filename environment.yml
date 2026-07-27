@@ -1,0 +1,61 @@
+# Conda environment for WBM_ET_Exploration.
+#
+# Create:   conda env create -f environment.yml
+# Update:   conda env update -f environment.yml --prune
+# Activate: conda activate wbm-et-exploration
+#
+# Geospatial packages (rasterio, geopandas, gdal) are much easier to get
+# working via conda-forge than pip, so conda is the recommended path here.
+# If you'd rather use plain pip/venv, see the "pip only" note at the bottom.
+name: wbm-et-exploration
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+
+  # ── Core scientific stack ──────────────────────────────────────────────────
+  - numpy
+  - pandas
+  - scipy
+
+  # ── Geospatial / raster / vector ───────────────────────────────────────────
+  - rasterio
+  - geopandas
+  - shapely
+  - pyproj
+  - gdal
+  - xarray
+  - netcdf4       # backend xarray needs to open gridMET NetCDF (THREDDS pull)
+
+  # ── Google Earth Engine ─────────────────────────────────────────────────────
+  - earthengine-api
+  - geemap
+
+  # ── Mapping / visualization ──────────────────────────────────────────────────
+  - folium
+  - branca
+  - matplotlib
+
+  # ── Notebook environment ────────────────────────────────────────────────────
+  - jupyterlab
+  - ipykernel
+
+  # ── I/O helpers ──────────────────────────────────────────────────────────────
+  - openpyxl      # read/write .xlsx (station metadata, OpenET metric exports)
+  - requests
+  - tqdm
+
+  # ── pip-only packages (not reliably on conda-forge) ─────────────────────────
+  - pip
+  - pip:
+      - adjustText
+      - geodatasets
+
+# ── pip-only alternative (no conda) ──────────────────────────────────────────
+# python -m venv .venv && source .venv/bin/activate
+# pip install numpy pandas scipy rasterio geopandas shapely pyproj xarray \
+#             netCDF4 earthengine-api geemap folium branca matplotlib \
+#             jupyterlab ipykernel openpyxl requests tqdm adjustText geodatasets
+#
+# Note: rasterio/geopandas/gdal wheels on PyPI usually work fine on Linux/Mac,
+# but conda-forge is more reliable if you hit build/binary issues.
