@@ -196,8 +196,15 @@ def nps_wbm(daily_df: pd.DataFrame,
         rhmax = df["RHmax"].to_numpy() if "RHmax" in df else None
         rhmin = df["RHmin"].to_numpy() if "RHmin" in df else None
         vp_col = df["vp"].to_numpy() if "vp" in df else None
+        # Optional daily wind speed at 2 m (e.g. gridMET 'vs' band corrected
+        # via get_wind_speed_2m()). Falls back to the function's constant
+        # default (2.2 m/s) if no 'wind_ms' column is supplied — previously
+        # this branch never passed wind through at all, so any wind_ms
+        # column was silently ignored.
+        wind_arg = df["wind_ms"].to_numpy(dtype=float) if "wind_ms" in df else 2.2
         pet = get_penman_monteith_pet(tmax, tmin, doy, elev,
-                                      lat[0], rhmax, rhmin, vp_col)
+                                      lat[0], rhmax, rhmin, vp_col,
+                                      wind=wind_arg)
     elif pet_method == "Oudin":
         pet = get_oudin_pet(doy, lat[0], pack, tmean, slope, aspect, shade_coeff)
     else:

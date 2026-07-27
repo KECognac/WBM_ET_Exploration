@@ -200,6 +200,38 @@ def get_daylength(dates: pd.Series, lat: Union[float, np.ndarray]) -> np.ndarray
 # 5.  PET METHODS
 # ──────────────────────────────────────────────────────────────────────────────
 
+def get_wind_speed_2m(uz: np.ndarray, z: float = 10.0) -> np.ndarray:
+    """
+    Convert wind speed measured at height ``z`` to the standard 2 m height
+    used by FAO-56 Penman-Monteith (log-wind-profile correction).
+
+    Source: FAO-56 eq. 47.
+
+    Parameters
+    ----------
+    uz : array-like
+        Wind speed (m s⁻¹) measured/modelled at height ``z``.
+    z : float, optional
+        Measurement height (m). Default 10 m — the height of gridMET's
+        ``vs`` band (wind speed at 10 m).
+
+    Returns
+    -------
+    np.ndarray
+        Wind speed (m s⁻¹) at 2 m height (``u2``).
+
+    Notes
+    -----
+    gridMET's ``vs`` band is at 10 m, not the 2 m FAO-56 assumes, so this
+    correction should be applied before passing gridMET wind into
+    ``get_penman_monteith_pet()``:
+
+        u2 = get_wind_speed_2m(vs_10m, z=10.0)
+    """
+    uz = np.asarray(uz, dtype=float)
+    return uz * (4.87 / np.log(67.8 * z - 5.42))
+
+
 def get_oudin_pet(doy: np.ndarray, lat: float, snowpack: np.ndarray,
                   tmean: np.ndarray, slope: float, aspect: float,
                   shade_coeff: float = 1.0) -> np.ndarray:
@@ -296,9 +328,16 @@ def get_penman_monteith_pet(tmax: np.ndarray, tmin: np.ndarray,
                              rhmax: Optional[np.ndarray] = None,
                              rhmin: Optional[np.ndarray] = None,
                              vp: Optional[np.ndarray] = None,
-                             wind: float = 2.2) -> np.ndarray:
+                             wind: Union[float, np.ndarray] = 2.2) -> np.ndarray:
     """
-    FAO-56 Penman-Monteith daily reference ET (mm).
+    FAO-56 Penman-Monteith daily reference ET, ETo (mm).
+
+    Note this returns ETo — reference ET for a hypothetical well-watered
+    grass surface — not PET for your actual site's vegetation. To use this
+    as a WBM PET input, apply a crop coefficient: PET = Kc * ETo (Kc = 1.0
+    is a common simplifying baseline). See ``wbm.model.nps_wbm``'s
+    ``pet_mult`` parameter, which can double as this Kc multiplier when
+    ``pet_method="Penman-Monteith"``.
 
     Parameters
     ----------
@@ -315,13 +354,15 @@ def get_penman_monteith_pet(tmax: np.ndarray, tmin: np.ndarray,
         is not supplied.
     vp : array-like, optional
         Daily actual vapor pressure (kPa). Overrides rh-based estimate.
-    wind : float, optional
-        Mean wind speed (m s⁻¹). Default 2.2 m/s (~5 mph).
+    wind : float or array-like, optional
+        Wind speed at 2 m height (m s⁻¹) — a scalar constant, or a daily
+        time series (e.g. gridMET's ``vs`` band corrected from 10 m to 2 m
+        via ``get_wind_speed_2m()``). Default 2.2 m/s (~5 mph) constant.
 
     Returns
     -------
     np.ndarray
-        Daily reference ET (mm).
+        Daily reference ET, ETo (mm).
     """
     tmax = np.asarray(tmax, dtype=float)
     tmin = np.asarray(tmin, dtype=float)
