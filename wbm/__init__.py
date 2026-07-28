@@ -19,6 +19,10 @@ This package was split out of the original single-file
 * ``wbm.raster_io``  – loading the elevation/soil/Jennings-temperature
                        GeoTIFFs and extracting per-point site parameters
                        (the only module that needs ``rasterio``/``scipy``).
+* ``wbm.cache_utils`` – incremental per-site caching (``load_and_filter_missing``,
+                       ``merge_and_save_cache``) used by notebooks 02-04/06 so
+                       adding new sites doesn't require re-downloading or
+                       re-running everything that's already cached.
 
 Every public name from those modules is re-exported here, so existing code
 that did ``import nps_wbm_functions as wbm`` can be updated to simply
@@ -71,6 +75,10 @@ from .raster_io import (
     load_wbm_rasters,
     extract_point_params,
 )
+from .cache_utils import (
+    load_and_filter_missing,
+    merge_and_save_cache,
+)
 
 __all__ = [
     # met_pet
@@ -85,6 +93,8 @@ __all__ = [
     "nps_wbm", "run_nps_wbm_points", "run_pipeline",
     # raster_io
     "load_wbm_rasters", "extract_point_params",
+    # cache_utils
+    "load_and_filter_missing", "merge_and_save_cache",
 ]
 
 __version__ = "0.1.0"
