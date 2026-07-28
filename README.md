@@ -14,7 +14,7 @@ and later expanded to the nationwide flux tower list so the same validation
 can inform how the WBM is used across the NPS system generally, not just at
 those six parks.
 
-### 📊 [View the results report](https://kecognac.github.io/WBM_ET_Exploration/reports/pet_comparison_report.html)
+### 📊 [View the results report](https://nps-water-supply-vulnerability.github.io/WBM_ET_Exploration/reports/pet_comparison_report.html)
 
 A concise, self-contained HTML summary comparing the Oudin and
 Penman-Monteith WBM AET runs against OpenET and flux towers (live page via
