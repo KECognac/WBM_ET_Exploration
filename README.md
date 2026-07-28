@@ -8,12 +8,6 @@ major CONUS ecosystems. A separate side analysis (notebook 08) restricts the
 same cached results to the smaller subset of sites within 50 km of an NPS
 park unit, which was this project's original scope.
 
-Originally developed as a class project (CIVE 523, Remote Sensing Hydrology)
-around six NPS sites; reorganized here into a standalone, reproducible repo
-and later expanded to the nationwide flux tower list so the same validation
-can inform how the WBM is used across the NPS system generally, not just at
-those six parks.
-
 ### 📊 [View the results report](https://nps-water-supply-vulnerability.github.io/WBM_ET_Exploration/reports/pet_comparison_report.html)
 
 A concise, self-contained HTML summary comparing the Oudin and
