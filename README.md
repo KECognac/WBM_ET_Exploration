@@ -4,7 +4,7 @@ Validating the National Park Service (NPS) Water Balance Model (WBM) against
 OpenET remote-sensing evapotranspiration and AmeriFlux/USGS eddy-covariance
 flux towers, across the full nationwide list of flux tower sites with data
 overlapping the OpenET period (2016–2023) — roughly 80 sites spanning most
-major CONUS ecosystems. A separate side analysis (notebook 08) restricts the
+major CONUS ecosystems. A separate side analysis (notebook 09) restricts the
 same cached results to the smaller subset of sites within 50 km of an NPS
 park unit, which was this project's original scope.
 
@@ -21,7 +21,7 @@ file: [`reports/pet_comparison_report.html`](reports/pet_comparison_report.html)
    overlapping the OpenET period (2016–2023) — not restricted to sites near a
    park — and saves it to `Data/geo_data/flux_towers.csv`. Separately
    identifies the subset of those sites within 50 km of an NPS park unit
-   (`Data/geo_data/flux_towers_near_parks.csv`), used only by notebook 08's
+   (`Data/geo_data/flux_towers_near_parks.csv`), used only by notebook 09's
    side analysis below.
 2. Pulls observed flux-tower ET, point-sampled and grid-cell-averaged OpenET
    (via Google Earth Engine), and gridMET daily climate for every site in the
@@ -42,37 +42,51 @@ file: [`reports/pet_comparison_report.html`](reports/pet_comparison_report.html)
    crop coefficient (`Kc = 1.0` baseline, easy to change) to convert
    ETo → PET before running it through the same WBM soil/snow/AET machinery
    as the Oudin run.
-7. (`notebook 07`) Benchmarks *three* WBM AET variants — default Oudin,
-   notebook 04's PET-multiplier-**calibrated** Oudin, and (uncalibrated)
-   Penman-Monteith — against OpenET (the same 4 km gridcell ensemble
-   notebook 04 validates against) and against flux tower ET, producing
-   per-site bias/RMSE/R² tables for all six comparisons. At nationwide scale
-   (~80 sites) the figures are condensed rather than faceted per site: one
-   scatter plot per AET method with a point per site (colored by ecosystem,
-   panels for both OpenET and flux tower), example monthly timeseries for
-   three representative sites (best/median/worst, ranked by calibrated-Oudin
-   RMSE vs. OpenET), an ecosystem RMSE comparison, and a spatial map of which
-   variant matches OpenET best at each site. Now also evaluates a fourth
-   variant (per-ecosystem-calibrated Oudin, from notebook 04) and restricts
-   every calibrated-vs-OpenET comparison to a genuine 2022–2023 held-out test
-   period, reporting mean/median/worst-decile robustness across sites rather
-   than the mean alone. Read-only (no WBM run or GEE access) — just reads
-   notebooks 02/03/04/06's cached outputs. See
-   `reports/pet_comparison_report.html` for a narrative summary of results.
-8. (`notebook 08`) A side analysis, not part of the main pipeline: reuses the
-   exact same cached results as notebook 07, filtered down to just the sites
+7. (`notebook 07`) Calibrates Penman-Monteith the same way notebook 04
+   calibrates Oudin, but scales the crop coefficient (`Kc`) instead of a PET
+   multiplier: a multiplicative `Kc` factor is fit against OpenET using only
+   the 2016–2021 calibration period, at both per-site and per-ecosystem
+   granularity, then evaluated on the 2022–2023 held-out test period. This
+   tests whether Penman-Monteith's uncalibrated `Kc = 1.0` baseline was
+   understating its potential accuracy, on equal footing with calibrated
+   Oudin. Wind-speed dependence means, like the uncalibrated Penman-Monteith
+   run, this variant still isn't usable with LOCA2/CMIP6 future-climate
+   projections.
+8. (`notebook 08`) Benchmarks *six* WBM AET variants — default Oudin,
+   notebook 04's per-site- and per-ecosystem-**calibrated** Oudin,
+   (uncalibrated) Penman-Monteith, and notebook 07's per-site- and
+   per-ecosystem-**calibrated** Penman-Monteith — against OpenET (the same
+   4 km gridcell ensemble notebooks 04/07 validate against) and against flux
+   tower ET, producing per-site bias/RMSE/R² tables for every comparison. At
+   nationwide scale (~80 sites) the figures are condensed rather than
+   faceted per site: one scatter plot per AET method with a point per site
+   (colored by ecosystem, panels for both OpenET and flux tower), example
+   monthly timeseries for three representative sites (best/median/worst,
+   ranked by calibrated-Oudin RMSE vs. OpenET), an ecosystem RMSE
+   comparison, and a spatial map of which variant matches OpenET best at
+   each site. Every calibrated-vs-OpenET comparison is restricted to a
+   genuine 2022–2023 held-out test period, reporting mean/median/worst-decile
+   robustness across sites rather than the mean alone, plus paired
+   significance tests between the leading candidates. Read-only (no WBM run
+   or GEE access) — just reads notebooks 02/03/04/06/07's cached outputs. See
+   `reports/pet_comparison_report.html` for a narrative summary of results
+   (currently reflects the four-variant design; the two calibrated-PM
+   variants are not yet folded into the report — see Known limitations).
+9. (`notebook 09`) A side analysis, not part of the main pipeline: reuses the
+   exact same cached results as notebook 08, filtered down to just the sites
    within 50 km of a park. Since that subset is small (~35 sites), it keeps
    the original full per-site faceted figures (one panel per site) instead
-   of notebook 07's condensed versions. No new GEE calls or WBM runs —
-   read-only, like notebook 07. **Not yet updated** to notebook 07's held-out,
-   four-variant design — still reports the original in-sample, per-site-only
-   calibrated comparison for the park-proximity subset.
-9. (`notebook 09`) Water-balance implications: since AET is the WBM's primary
-   outflow competing with runoff, quantifies how much switching from
-   uncalibrated Oudin to per-site-calibrated Oudin or Penman-Monteith would
-   change the model's simulated annual runoff, nationwide and by ecosystem.
-   Read-only — reuses notebooks 03/04/06's cached daily WBM outputs
-   (`RUNOFF` is already a per-day output column in each).
+   of notebook 08's condensed versions. No new GEE calls or WBM runs —
+   read-only, like notebook 08. **Not yet updated** to notebook 08's held-out,
+   six-variant design — still reports the original in-sample, per-site-only
+   calibrated-Oudin comparison for the park-proximity subset.
+10. (`notebook 10`) Water-balance implications: since AET is the WBM's
+    primary outflow competing with runoff, quantifies how much switching
+    from uncalibrated Oudin to per-site-calibrated Oudin or Penman-Monteith
+    would change the model's simulated annual runoff, nationwide and by
+    ecosystem. Read-only — reuses notebooks 03/04/06's cached daily WBM
+    outputs (`RUNOFF` is already a per-day output column in each). Does not
+    yet include notebook 07's calibrated-Penman-Monteith variants.
 
 ## Repo structure
 
@@ -95,9 +109,10 @@ WBM_ET_Exploration/
 │   ├── 04_validate_and_calibrate.ipynb
 │   ├── 05_figures_and_export.ipynb
 │   ├── 06_oudin_vs_penman_monteith_pet.ipynb   Oudin vs. Penman-Monteith PET/AET comparison (see below)
-│   ├── 07_pet_methods_vs_openet.ipynb   both PET methods' WBM AET vs. OpenET, condensed for nationwide scale (see below)
-│   ├── 08_park_proximity_side_analysis.ipynb   same comparison, filtered to park-adjacent sites, full per-site facets (see below)
-│   ├── 09_runoff_implications.ipynb   water-balance implications of AET method choice (see below)
+│   ├── 07_pm_kc_calibration.ipynb   per-site and per-ecosystem Kc calibration for Penman-Monteith (see below)
+│   ├── 08_pet_methods_vs_openet.ipynb   all six AET variants' WBM AET vs. OpenET, condensed for nationwide scale (see below)
+│   ├── 09_park_proximity_side_analysis.ipynb   same comparison, filtered to park-adjacent sites, full per-site facets (see below)
+│   ├── 10_runoff_implications.ipynb   water-balance implications of AET method choice (see below)
 │   └── exploratory/
 │       └── alt_gridmet_thredds.ipynb   untested scratch: THREDDS-based gridMET fetch + raster QA
 ├── Data/                      NOT tracked in git (see Data below) — inputs, cached pulls, figures
@@ -168,24 +183,33 @@ downloaded or regenerated by the notebooks themselves:
   per-site model parameters. These cover the full CONUS extent (confirmed
   against the nationwide flux tower list), not just the original six parks,
   so no new rasters are needed for the nationwide expansion.
-* **Notebook 07 vs. 08 figure outputs** — notebook 07 (nationwide, condensed
-  figures) saves to `Data/pet_comparison/`; notebook 08 (park-proximity,
+* **Notebook 08 vs. 09 figure outputs** — notebook 08 (nationwide, condensed
+  figures) saves to `Data/pet_comparison/`; notebook 09 (park-proximity,
   full per-site facets) saves to `Data/pet_comparison_near_parks/` so the
   two don't overwrite each other.
+* **Notebook 07 outputs** — per-site and per-ecosystem calibrated-`Kc`
+  Penman-Monteith results are cached to `Data/gridmet_cache/` alongside
+  notebook 04's Oudin calibration outputs (`kc_site_*.csv`,
+  `kc_ecosystem_*.csv`, `wbm_results_site_cal_pm_*.csv`,
+  `wbm_results_ecosystem_cal_pm_*.csv`), following the same naming
+  convention.
 
 ## Known limitations
 
-* Every notebook (01→02→03→04→05, and 06→07/08) reloads its prerequisites
+* Every notebook (01→02→03→04→05, and 06→07→08/09) reloads its prerequisites
   from `Data/` at the top of the notebook, so each can be opened in a fresh
   kernel as long as the earlier ones have been run at least once. (Notebook
   04's calibration outputs — `OBJECTIVE`, `eco_metrics`, and the
   `metrics_*_vs_*` tables notebook 05 needs — are cached to
-  `Data/gridmet_cache/` by a cell at the end of notebook 04.)
-* `reports/pet_comparison_report.html` reflects the nationwide, held-out,
-  four-variant comparison (notebooks 04/07); notebook 08's park-proximity
-  side analysis has not yet been brought up to that same design (see item 8
-  above) and notebook 09's runoff-implications findings aren't folded into
-  the main report yet.
+  `Data/gridmet_cache/` by a cell at the end of notebook 04; notebook 07's
+  calibrated-`Kc` outputs are cached the same way for notebook 08 to read.)
+* `reports/pet_comparison_report.html` reflects the four-variant design
+  (default and calibrated Oudin, default Penman-Monteith); notebook 07's
+  calibrated-Penman-Monteith variants are not yet folded into the report,
+  notebook 09's park-proximity side analysis has not yet been brought up to
+  notebook 08's held-out, six-variant design (see item 9 above), and
+  notebook 10's runoff-implications findings don't yet include the
+  calibrated-Penman-Monteith variants either.
 * The incremental per-site caching (`wbm.cache_utils`, used in notebooks 02,
   03, 04, and 06) resumes *across* runs but doesn't checkpoint *within* one:
   if a run is interrupted partway through the new/missing sites, that

@@ -201,7 +201,28 @@ def nps_wbm(daily_df: pd.DataFrame,
         # default (2.2 m/s) if no 'wind_ms' column is supplied — previously
         # this branch never passed wind through at all, so any wind_ms
         # column was silently ignored.
-        wind_arg = df["wind_ms"].to_numpy(dtype=float) if "wind_ms" in df else 2.2
+        #
+        # NOTE: a present-but-NaN 'wind_ms' column (e.g. a site cached before
+        # wind was added to a climate pull, then never re-fetched — this
+        # happened for ~35/81 sites in this repo's own gridMET cache) used to
+        # pass NaN straight into get_penman_monteith_pet(), which silently
+        # produced NaN PET/AET for the entire record. Downstream monthly
+        # aggregation (pandas .sum() on an all-NaN group) then silently
+        # reported that as AET = 0.0 mm/month with no error or warning. The
+        # check below falls back to the 2.2 m/s default on a per-row basis
+        # wherever wind is actually missing, and prints a one-line warning so
+        # a data gap like that can't disappear silently again.
+        if "wind_ms" in df:
+            wind_arg = df["wind_ms"].to_numpy(dtype=float)
+            n_missing = np.isnan(wind_arg).sum()
+            if n_missing > 0:
+                site_label = df["site"].iloc[0] if "site" in df else "unknown site"
+                print(f"WARNING: {n_missing}/{len(wind_arg)} 'wind_ms' values are NaN "
+                      f"for {site_label} — falling back to the 2.2 m/s default for "
+                      "those rows instead of propagating NaN into PET/AET.")
+                wind_arg = np.where(np.isnan(wind_arg), 2.2, wind_arg)
+        else:
+            wind_arg = 2.2
         pet = get_penman_monteith_pet(tmax, tmin, doy, elev,
                                       lat[0], rhmax, rhmin, vp_col,
                                       wind=wind_arg)
